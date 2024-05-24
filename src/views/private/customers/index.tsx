@@ -1,10 +1,11 @@
+import DataTable from "./Components/DataTable";
 
 function Customers() {
-    return (
-        <div>
-            Customer
-        </div>
-    );
+  return (
+    <div>
+      <DataTable />
+    </div>
+  );
 }
 
 export default Customers;

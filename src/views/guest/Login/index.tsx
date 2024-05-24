@@ -7,6 +7,7 @@ import { onLogin } from "../../../server/log";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGetToken } from "../../../hooks/useLocal";
+import { showSuccess } from "../../../utils/Alerts";
 
 function Login() {
   const {
@@ -33,7 +34,7 @@ function Login() {
     console.log("input data", data);
     await onLogin(
       data,
-      () => navigate("/dashboard"),
+      () => { showSuccess("login Success")},
       () => {}
     );
     console.log("has Token ", hasToken);

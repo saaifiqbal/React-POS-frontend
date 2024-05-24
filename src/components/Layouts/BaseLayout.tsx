@@ -15,7 +15,8 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { menuItems } from "../Variables";
 import { onLogout } from "../../server/log";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
+import { showSuccess } from "../../utils/Alerts";
 
 interface Props {
   /**
@@ -44,7 +45,11 @@ export default function BaseLayout(props: Props) {
       <List>
         {menuItems.map((item) => (
           <ListItem key={item.label} disablePadding>
-            <ListItemButton sx={{ textAlign: "center" }}>
+            <ListItemButton
+              sx={{ textAlign: "center" }}
+              component={Link}
+              to={item.url}
+            >
               <ListItemText primary={item.label} />
             </ListItemButton>
           </ListItem>
@@ -81,18 +86,24 @@ export default function BaseLayout(props: Props) {
           </Typography>
           <Box sx={{ display: { xs: "none", sm: "block" } }}>
             {menuItems.map((item) => (
-              <Button key={item.label} sx={{ color: "#fff" }}>
+              <Button
+                key={item.label}
+                sx={{ color: "#fff" }}
+                component={Link}
+                to={item.url}
+              >
                 {item.label}
               </Button>
             ))}
           </Box>
-          <Box sx={{ display: { xs: "none", sm: "block" }, ml:10 }}>
+          <Box sx={{ display: { xs: "none", sm: "block" }, ml: 10 }}>
             <Button
               variant="contained"
               color="secondary"
               onClick={() => {
                 onLogout(
                   () => {
+                    showSuccess("Logout Success")
                     navigate("/login");
                   },
                   () => {}
