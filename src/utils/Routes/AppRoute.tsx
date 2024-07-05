@@ -1,12 +1,17 @@
+// AppRoute.tsx
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+import React, { Fragment, useCallback, useEffect } from "react";
+import { Routes, Route } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { RootState } from "../../store/store";
 import { Login } from "../../views/guest";
 import { Customers, Dashboard } from "../../views/private";
-import { useGetToken } from "../../hooks/useLocal";
-import { useCallback, useEffect } from "react";
 import BaseLayout from "../../components/Layouts/BaseLayout";
-import { useNavigate, useRoutes } from "react-router-dom";
-import { getUser } from "../../server/log";
-import { useDispatch, useSelector } from "react-redux";
-import { userAction } from "../../store/Slices/authSlice";
+import { getUser } from "../../store/thunks/auth";
+import { useGetToken } from "../../hooks/useLocal";
+import { SnackbarProvider } from "../../hooks/SnackBarProvider";
 
 const routes = [
   {
@@ -20,45 +25,49 @@ const routes = [
   { path: "/login", element: <Login /> },
 ];
 
-interface AuthState {
-  authenticate: {
-    user: object;
-  };
-}
-function AppRoute() {
-  const user: object | boolean = useSelector(
-    (state: AuthState) => state.authenticate.user
-  );
+const AppRoute: React.FC = () => {
   const hasToken = useGetToken();
+  const user = useSelector((state: RootState) => state.authenticate?.authData);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const setUser = useCallback(
-    (data: object) => {
-      dispatch(userAction(data));
-    },
-    [dispatch]
-  );
-  const getUsers = useCallback(
-    async () =>
-      await getUser(
-        (data: object) => {
-          setUser(data);
-        },
-        () => {}
-      ),
-    [setUser]
-  );
-
-  useEffect(() => {
+  const checkAuth = useCallback(() => {
+    console.log("has Token", !hasToken);
     if (!hasToken) {
       navigate("/login");
+    } else if (!user || (Array.isArray(user) && user.length === 0)) {
+      dispatch(
+        getUser({
+          onSuccess: () => {
+            console.log("Success login ");
+          },
+          onError: () => {
+            console.log("Failed login");
+            // Handle error scenario, e.g., redirect to login page or show error message
+          },
+        })
+      );
     }
+  }, [hasToken, navigate, dispatch]);
 
-    getUsers();
-  }, [hasToken, getUsers, navigate]);
-  const route = useRoutes(routes);
-  return route;
-}
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  return (
+    <Fragment>
+      <Routes>
+        {routes.map((route, index) => (
+          <Route key={index} path={route.path} element={route.element}>
+            {route.children &&
+              route.children.map((child, index) => (
+                <Route key={index} path={child.path} element={child.element} />
+              ))}
+          </Route>
+        ))}
+      </Routes>
+    </Fragment>
+  );
+};
 
 export default AppRoute;

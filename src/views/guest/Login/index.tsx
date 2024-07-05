@@ -1,15 +1,19 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import { yupResolver } from "@hookform/resolvers/yup";
 import { CardContent, Button, Card, TextField } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { Fragment } from "react/jsx-runtime";
 import { loginSchema } from "../../../utils/validation";
-import { onLogin } from "../../../server/log";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGetToken } from "../../../hooks/useLocal";
-import { showSuccess } from "../../../utils/Alerts";
+import { useDispatch } from "react-redux";
+import { fetchLogin } from "../../../store/thunks/auth";
+import { useSnackbar } from "../../../hooks/SnackBarProvider";
 
 function Login() {
+  const { showSuccess } = useSnackbar();
   const {
     handleSubmit,
     control,
@@ -23,6 +27,7 @@ function Login() {
   });
   const hasToken = useGetToken();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (hasToken) {
@@ -30,14 +35,18 @@ function Login() {
     }
   }, [hasToken, navigate]);
 
-  const onSubmit = async (data: { email: string; password: string }) => {
-    console.log("input data", data);
-    await onLogin(
-      data,
-      () => { showSuccess("login Success")},
-      () => {}
+  const onSubmit = (data: { email: string; password: string }) => {
+    console.log("input data", data)
+    dispatch(
+      fetchLogin({
+        data,
+        onSuccess: () => {
+          console.log("Login Successfully");
+          showSuccess("Login Successfully")
+        },
+        onError: () => {},
+      })
     );
-    console.log("has Token ", hasToken);
   };
 
   return (

@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import * as React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -14,9 +17,10 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { menuItems } from "../Variables";
-import { onLogout } from "../../server/log";
 import { Link, Outlet, useNavigate } from "react-router-dom";
-import { showSuccess } from "../../utils/Alerts";
+import loading1 from "../../assets/images/Loading1.gif";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchLogout } from "../../store/thunks/auth";
 
 interface Props {
   /**
@@ -30,6 +34,7 @@ const drawerWidth = 240;
 
 export default function BaseLayout(props: Props) {
   const { window } = props;
+  const dispatch = useDispatch();
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   const handleDrawerToggle = () => {
@@ -62,83 +67,95 @@ export default function BaseLayout(props: Props) {
     window !== undefined ? () => window().document.body : undefined;
 
   const navigate = useNavigate();
-
-  return (
-    <Box sx={{ display: "flex" }}>
-      <CssBaseline />
-      <AppBar component="nav">
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: "none" } }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
-          >
-            POS Management
-          </Typography>
-          <Box sx={{ display: { xs: "none", sm: "block" } }}>
-            {menuItems.map((item) => (
-              <Button
-                key={item.label}
-                sx={{ color: "#fff" }}
-                component={Link}
-                to={item.url}
-              >
-                {item.label}
-              </Button>
-            ))}
-          </Box>
-          <Box sx={{ display: { xs: "none", sm: "block" }, ml: 10 }}>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={() => {
-                onLogout(
-                  () => {
-                    showSuccess("Logout Success")
-                    navigate("/login");
-                  },
-                  () => {}
-                );
-              }}
+  const loading = useSelector((state: any) => state.authenticate?.isLoading);
+  console.log("loading ", loading);
+  if (loading === true)
+    return (
+      <div className="flex justify-center h-screen items-center">
+        <img src={loading1} alt="loading" />
+      </div>
+    );
+  else
+    return (
+      <Box sx={{ display: "flex" }}>
+        <CssBaseline />
+        <AppBar component="nav">
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2, display: { sm: "none" } }}
             >
-              Logout
-            </Button>
-          </Box>
-        </Toolbar>
-      </AppBar>
-      <nav>
-        <Drawer
-          container={container}
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
-          }}
-          sx={{
-            display: { xs: "block", sm: "none" },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
-              width: drawerWidth,
-            },
-          }}
-        >
-          {drawer}
-        </Drawer>
-      </nav>
-      <Box component="main" sx={{ p: 3 }}>
-        <Toolbar />
-        <Outlet />
+              <MenuIcon />
+            </IconButton>
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
+            >
+              POS Management
+            </Typography>
+            <Box sx={{ display: { xs: "none", sm: "block" } }}>
+              {menuItems.map((item) => (
+                <Button
+                  key={item.label}
+                  sx={{ color: "#fff" }}
+                  component={Link}
+                  to={item.url}
+                >
+                  {item.label}
+                </Button>
+              ))}
+            </Box>
+            <Box sx={{ display: { xs: "none", sm: "block" }, ml: 10 }}>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() =>
+                  dispatch(
+                    fetchLogout({
+                      onSuccess: () => {
+                        showSuccess("Logout Success");
+                        navigate("/login");
+                      },
+                      onError: () => {
+                        // Handle error scenario if needed
+                      },
+                    })
+                  )
+                }
+              >
+                Logout
+              </Button>
+            </Box>
+          </Toolbar>
+        </AppBar>
+        <nav>
+          <Drawer
+            container={container}
+            variant="temporary"
+            open={mobileOpen}
+            onClose={handleDrawerToggle}
+            ModalProps={{
+              keepMounted: true, // Better open performance on mobile.
+            }}
+            sx={{
+              display: { xs: "block", sm: "none" },
+              "& .MuiDrawer-paper": {
+                boxSizing: "border-box",
+                width: drawerWidth,
+              },
+            }}
+          >
+            {drawer}
+          </Drawer>
+        </nav>
+        <Box component="main" sx={{ p: 3 }}>
+          <Toolbar />
+          <Outlet />
+        </Box>
       </Box>
-    </Box>
-  );
+    );
 }

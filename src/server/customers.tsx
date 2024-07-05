@@ -1,22 +1,16 @@
 import api from "./api";
-import { setAllCustomerAction } from "../store/Slices/customerSlice";
 
 export const getCustomers = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  dispatch: any,
-  onSuccess: () => void,
-  onError: () => void
 ) => {
   await api
     .get("v1/customer/list")
-    .then((res: { data: object }) => {
+    .then((res: { data: {data: object} }) => {
       console.log("get Customer Success", res);
-      dispatch(setAllCustomerAction(res.data));
-      onSuccess();
+      return res.data;
     })
     .catch((err: Error) => {
-      onError();
       console.log("get Customer Error", err);
+
     });
 };
 export const createCustomer = async (
