@@ -10,15 +10,11 @@ export default function DataTable() {
   const dispatch: any = useDispatch();
 
   const getCustomerList = useCallback(async () => {
-    await dispatch(
-      getCustomers(
-        dispatch,
-        () => {},
-        () => {}
-      )
-    );
+    await dispatch(getCustomers({ page: 0, pageSize: 3 }));
   }, [dispatch]);
-  useEffect(() => {getCustomerList()}, [getCustomerList]);
+  useEffect(() => {
+    getCustomerList();
+  }, [getCustomerList]);
 
   const columns: GridColDef<(typeof rows)[number]>[] = [
     { field: "id", headerName: "ID", width: 90 },
@@ -114,6 +110,9 @@ export default function DataTable() {
             toolbar: {
               showQuickFilter: true,
             },
+          }}
+          onPaginationModelChange={(e, f) => {
+            console.log("Pagination Meta Change ", e, f);
           }}
           // disableColumnFilter
           disableColumnSelector

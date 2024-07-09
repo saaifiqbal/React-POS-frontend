@@ -68,7 +68,6 @@ export default function BaseLayout(props: Props) {
 
   const navigate = useNavigate();
   const loading = useSelector((state: any) => state.authenticate?.isLoading);
-  console.log("loading ", loading);
   if (loading === true)
     return (
       <div className="flex justify-center h-screen items-center">

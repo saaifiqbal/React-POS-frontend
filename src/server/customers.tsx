@@ -1,17 +1,43 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import api from "./api";
 
 export const getCustomers = async (
+  {
+    page,
+    pageSize,
+    field,
+    sort,
+    search,
+  }: {
+    page: number;
+    pageSize: number;
+    field: string;
+    sort: string;
+    search: string;
+  },
+  onSuccess: () => void,
+  onError: () => void
 ) => {
+  let customers: any = [];
   await api
-    .get("v1/customer/list")
-    .then((res: { data: {data: object} }) => {
-      console.log("get Customer Success", res);
-      return res.data;
+    .get(`v1/customer/list`, {
+      params: {
+        page: page + 1,
+        pageSize: pageSize,
+        field: field,
+        sort: sort,
+        search: search,
+      },
+    })
+    .then((res: { data: { data: object } }) => {
+      onSuccess();
+      customers = res.data;
     })
     .catch((err: Error) => {
       console.log("get Customer Error", err);
-
+      onError();
     });
+  return customers;
 };
 export const createCustomer = async (
   data: object,

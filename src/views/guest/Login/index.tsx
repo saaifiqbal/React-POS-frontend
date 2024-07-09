@@ -13,7 +13,7 @@ import { fetchLogin } from "../../../store/thunks/auth";
 import { useSnackbar } from "../../../hooks/SnackBarProvider";
 
 function Login() {
-  const { showSuccess } = useSnackbar();
+  const { showSuccess, showError } = useSnackbar();
   const {
     handleSubmit,
     control,
@@ -36,15 +36,17 @@ function Login() {
   }, [hasToken, navigate]);
 
   const onSubmit = (data: { email: string; password: string }) => {
-    console.log("input data", data)
+    console.log("input data", data);
     dispatch(
       fetchLogin({
         data,
         onSuccess: () => {
           console.log("Login Successfully");
-          showSuccess("Login Successfully")
+          showSuccess("Login Successfully");
         },
-        onError: () => {},
+        onError: () => {
+          showError("Login Failed");
+        },
       })
     );
   };
