@@ -31,7 +31,7 @@ const authSlice = createSlice({
     const handleRejected = (state: AuthState, action: PayloadAction<any>) => {
       state.isLoading = false;
       state.isError = true;
-      state.error = action.error?.message ?? "Unknown error";
+      state.error = action?.error?.message ?? "Unknown error";
       localStorage.removeItem("token");
     };
 

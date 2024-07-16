@@ -44,6 +44,7 @@ export const createCustomer = async (
   onSuccess: () => void,
   onError: () => void
 ) => {
+  console.log("create hit", data);
   await api
     .post("v1/customer", data)
     .then(() => {
@@ -79,6 +80,7 @@ export const updateCustomer = async (
   onSuccess: () => void,
   onError: () => void
 ) => {
+  console.log("Update hit", id, element);
   await api
     .put(`v1/customer/${id}`, element)
     .then((res: { data: object }) => {

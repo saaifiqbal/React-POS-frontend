@@ -151,9 +151,10 @@ export default function BaseLayout(props: Props) {
             {drawer}
           </Drawer>
         </nav>
-        <Box component="main" sx={{ p: 3 }}>
-          <Toolbar />
-          <Outlet />
+        <Box component="main" >
+          <div className="pt-16 w-screen flex justify-center">
+            <Outlet />
+          </div>
         </Box>
       </Box>
     );

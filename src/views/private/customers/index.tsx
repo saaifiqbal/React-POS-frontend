@@ -1,15 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import { useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import DataTable from "../../../components/DataTable";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCustomers } from "../../../store/thunks/customer";
-import { GridFilterModel } from "@mui/x-data-grid";
-
+import EntryField from "./Components/EntryField";
+import BorderColorIcon from "@mui/icons-material/BorderColor";
+import { DeleteAlert } from "../../../components/Common";
+import { IconButton, Typography } from "@mui/material";
 // import DataTable from "./Components/DataTable";
 
 function Customers() {
+  //variable and state
+  const [select, setSelect] = useState(null);
   const dispatch = useDispatch();
   // tableElement
   const columns = [
@@ -45,8 +49,23 @@ function Customers() {
       headerName: "Actions",
       description: "This column has a value getter and is not sortable.",
       sortable: false,
+      headerAlign: "center",
+      align: "center",
       width: 260,
-      valueGetter: (value, row) => `${row.first_name || ""} `,
+      renderCell: ({ row }) => (
+        <Fragment>
+          <IconButton>
+            <BorderColorIcon color="primary" onClick={() => setSelect(row)} />
+          </IconButton>{" "}
+          <IconButton>
+            <DeleteAlert
+              title="Customer"
+              name={row?.first_name + " " + row?.last_name}
+              confirm={handleDelete}
+            />
+          </IconButton>
+        </Fragment>
+      ),
     },
   ];
   const customersList = useSelector((state) => state.customers);
@@ -72,9 +91,9 @@ function Customers() {
     );
   }, [dispatch, params]);
 
-  useEffect(() => {
-    getCustomerList();
-  }, [getCustomerList]);
+  const handleDelete = () => {
+    console.log("Delete Confirm");
+  };
 
   const onPaginationChange = (event: any, field: any) => {
     console.log("Pagination Meta Change ", event, field);
@@ -88,16 +107,26 @@ function Customers() {
     }));
     console.log("params Meta Change ", params);
   };
-  const filterChange = ({ items, quickFilterValues }) => {
-    console.log("event filter", items, quickFilterValues);
+  const filterChange = ({ quickFilterValues: [search] }) => {
+    console.log("event filter", search);
     setParams((prev) => ({
       ...prev,
-      search: quickFilterValues[0] ?? "",
+      search: search ?? "",
     }));
   };
+  // lifecycle
+  useEffect(() => {
+    getCustomerList();
+  }, [getCustomerList]);
   return (
-    <div className="w-full">
+    <div className="py-3">
       {/* <DataTable /> */}
+
+      <div className="px-3 flex justify-between">
+        <Typography variant="h5">Customer's List</Typography>
+        <EntryField data={select} setData={setSelect} />
+      </div>
+
       <DataTable
         columns={columns}
         rows={customersList.customers}

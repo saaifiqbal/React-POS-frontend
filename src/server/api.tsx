@@ -31,7 +31,6 @@ api.interceptors.response.use(
     }
     if (error.response && error.response.status === 401) {
       console.error("403 Forbidden Error: ", error.response);
-      alert("You do not have permission to perform this action.");
       // Optionally, you can log out the user or redirect them to a login page
       // localStorage.removeItem('token');
       // window.location.href = '/login';

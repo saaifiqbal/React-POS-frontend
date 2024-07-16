@@ -8,5 +8,5 @@ const store = configureStore({
     customers: customersReducer,
   },
 });
-
+export type AppDispatch = typeof store.dispatch;
 export default store;

@@ -4,7 +4,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { CardContent, Button, Card, TextField } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { Fragment } from "react/jsx-runtime";
-import { loginSchema } from "../../../utils/validation";
+import { loginSchema } from "../../../utils/validation/login";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGetToken } from "../../../hooks/useLocal";
@@ -36,12 +36,10 @@ function Login() {
   }, [hasToken, navigate]);
 
   const onSubmit = (data: { email: string; password: string }) => {
-    console.log("input data", data);
     dispatch(
       fetchLogin({
         data,
         onSuccess: () => {
-          console.log("Login Successfully");
           showSuccess("Login Successfully");
         },
         onError: () => {
