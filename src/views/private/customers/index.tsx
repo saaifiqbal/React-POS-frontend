@@ -4,16 +4,21 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 import DataTable from "../../../components/DataTable";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCustomers } from "../../../store/thunks/customer";
+import {
+  fetchCustomers,
+  fetchDeleteCustomer,
+} from "../../../store/thunks/customer";
 import EntryField from "./Components/EntryField";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import { DeleteAlert } from "../../../components/Common";
 import { IconButton, Typography } from "@mui/material";
+import { useSnackbar } from "../../../hooks/SnackBarProvider";
 // import DataTable from "./Components/DataTable";
 
 function Customers() {
   //variable and state
   const [select, setSelect] = useState(null);
+  const { showError, showSuccess } = useSnackbar();
   const dispatch = useDispatch();
   // tableElement
   const columns = [
@@ -59,9 +64,10 @@ function Customers() {
           </IconButton>{" "}
           <IconButton>
             <DeleteAlert
+              id={row?.id}
               title="Customer"
               name={row?.first_name + " " + row?.last_name}
-              confirm={handleDelete}
+              confirm={deleteCustomer}
             />
           </IconButton>
         </Fragment>
@@ -90,9 +96,19 @@ function Customers() {
       })
     );
   }, [dispatch, params]);
-
-  const handleDelete = () => {
-    console.log("Delete Confirm");
+  const deleteCustomer = (id: number) => {
+    dispatch(
+      fetchDeleteCustomer({
+        id: id,
+        onSuccess: () => {
+          getCustomerList();
+          showSuccess(`Customer Delete Successfully`);
+        },
+        onError: () => {
+          showError(`Customer Delete Failed`);
+        },
+      })
+    );
   };
 
   const onPaginationChange = (event: any, field: any) => {
@@ -124,7 +140,7 @@ function Customers() {
 
       <div className="px-3 flex justify-between">
         <Typography variant="h5">Customer's List</Typography>
-        <EntryField data={select} setData={setSelect} />
+        <EntryField data={select} setData={setSelect} getData={getCustomerList} />
       </div>
 
       <DataTable

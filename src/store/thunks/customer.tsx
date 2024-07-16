@@ -2,6 +2,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   createCustomer,
+  deleteCustomer,
   getCustomers,
   updateCustomer,
 } from "../../server/customers";
@@ -13,6 +14,12 @@ interface LoginArgs {
 }
 interface createArgs {
   data: any;
+  onSuccess: () => void;
+  onError: () => void;
+}
+
+interface deleteArgs {
+  id: number;
   onSuccess: () => void;
   onError: () => void;
 }
@@ -33,6 +40,18 @@ export const fetchCreateUpdateCustomer = createAsyncThunk<void, createArgs>(
       if (data.id)
         return await updateCustomer(data.id, data, onSuccess, onError);
       else return await createCustomer(data, onSuccess, onError);
+    } catch (error) {
+      onError();
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const fetchDeleteCustomer = createAsyncThunk<void, deleteArgs>(
+  "customers/fetchDeleteCustomer",
+  async ({ id, onSuccess, onError }, { rejectWithValue }) => {
+    try {
+      return await deleteCustomer(id, onSuccess, onError);
     } catch (error) {
       onError();
       return rejectWithValue(error);

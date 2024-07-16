@@ -24,6 +24,7 @@ interface params {
     zip_code: string;
   } | null;
   setData: (e: object | null) => void;
+  getData: () => void;
 }
 const initialData = {
   first_name: "",
@@ -32,7 +33,7 @@ const initialData = {
   email: "",
   zip_code: "",
 };
-export default function EntryField({ data, setData }: params) {
+export default function EntryField({ data, setData, getData }: params) {
   const { showSuccess, showError }: any = useSnackbar();
   const [open, setOpen] = useState<boolean>(false);
   const dispatch = useDispatch<AppDispatch>();
@@ -55,6 +56,8 @@ export default function EntryField({ data, setData }: params) {
       fetchCreateUpdateCustomer({
         data: data,
         onSuccess: () => {
+          getData();
+          setOpen(false);
           showSuccess(`${data?.id ? "Edit" : "Create"} Customer Successfully`);
         },
         onError: () => {
@@ -70,15 +73,23 @@ export default function EntryField({ data, setData }: params) {
       console.log("set data", data);
       reset(data);
       setOpen(true);
-    } else reset(initialData);
-  }, [data, reset]);
+    } else {
+      reset(initialData);
+    }
+  }, [data, reset, setData]);
 
   return (
     <Fragment>
       <Button variant="outlined" color="neutral" onClick={() => setOpen(true)}>
         Add Customer
       </Button>
-      <Modal open={open} onClose={() => setOpen(false)}>
+      <Modal
+        open={open}
+        onClose={() => {
+          setOpen(false);
+          setData(null);
+        }}
+      >
         <ModalDialog
           aria-labelledby="nested-modal-title"
           aria-describedby="nested-modal-description"

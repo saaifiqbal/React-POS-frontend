@@ -1,12 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchCreateUpdateCustomer, fetchCustomers } from "../thunks/customer";
+import {
+  fetchCreateUpdateCustomer,
+  fetchCustomers,
+  fetchDeleteCustomer,
+} from "../thunks/customer";
 
 interface initialType {
   customers: Array<object>;
   isLoading: boolean;
   isError: boolean;
   error: string | undefined;
-  total: number
+  total: number;
 }
 
 const initialState: initialType = {
@@ -14,7 +18,7 @@ const initialState: initialType = {
   isLoading: false,
   isError: false,
   error: "",
-  total: 0
+  total: 0,
 };
 
 const customerSlice = createSlice({
@@ -48,6 +52,21 @@ const customerSlice = createSlice({
         // state.total = action.payload?.data?.total;
       })
       .addCase(fetchCreateUpdateCustomer.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.error = action.error?.message;
+      })
+      .addCase(fetchDeleteCustomer.pending, (state) => {
+        state.isError = false;
+        state.isLoading = true;
+      })
+      .addCase(fetchDeleteCustomer.fulfilled, (state, action) => {
+        state.isLoading = false;
+        console.log("delete customer", action.payload);
+        // state.customers = action.payload?.data?.data;
+        // state.total = action.payload?.data?.total;
+      })
+      .addCase(fetchDeleteCustomer.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.error = action.error?.message;

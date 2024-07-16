@@ -8,12 +8,14 @@ import { Fragment, useState } from "react";
 import { red } from "@mui/material/colors";
 
 interface params {
+  id: number;
   title: string;
   name: string;
-  confirm: () => void;
+  confirm: (e: number) => void;
 }
-const DeleteAlert = ({ title, name, confirm }: params) => {
+const DeleteAlert = ({ id, title, name, confirm }: params) => {
   const [open, setOpen] = useState(false);
+  
   return (
     <Fragment>
       <DeleteIcon sx={{ color: red[600] }} onClick={() => setOpen(true)} />
@@ -53,7 +55,7 @@ const DeleteAlert = ({ title, name, confirm }: params) => {
               variant="solid"
               color="danger"
               onClick={() => {
-                confirm();
+                confirm(id);
                 setOpen(false);
               }}
             >
